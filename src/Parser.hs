@@ -7,8 +7,6 @@ module Parser
     ) where
 
 import Text.ParserCombinators.Parsec
-import Control.Monad
-import Numeric
 
 data INIParser = INIKey String
                | INIString String
@@ -17,6 +15,9 @@ data INIParser = INIKey String
                | INIBool Bool 
                | INISectionName String
                | INISection (INIParser, [(String, INIParser)]) deriving (Eq, Show)
+
+sign :: Parser String
+sign = string "-" <|> string "+" <|> string ""
 
 parseKey :: Parser INIParser
 parseKey = do
@@ -30,17 +31,23 @@ parseSectionName = do
     char ']'
     return $ INISectionName sn
 
--- FIXME: not supporting negative numbers
 parseInteger :: Parser INIParser
-parseInteger = liftM (INIInteger . read) $ many1 digit
+parseInteger = do
+    s <- sign
+    n <- many1 digit
+    return $ INIInteger $ case s of
+                            "-" -> read ("-" ++ n) :: Integer
+                            _ -> read n :: Integer
 
--- FIXME: not supporting negative numbers
 parseDouble :: Parser INIParser
 parseDouble = do
+    s <- sign
     dec <- many1 digit
     char '.'
     fl <- many1 digit
-    return $ INIDouble $ fst . head . readFloat $ dec ++ "." ++ fl
+    return $ INIDouble $ case s of
+                           "-" -> read ("-" ++ dec ++ "." ++ fl) :: Double
+                           _ -> read (dec ++ "." ++ fl) :: Double
 
 parseBoolean :: Parser INIParser
 parseBoolean = do

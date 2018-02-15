@@ -1,6 +1,6 @@
 name:                ini
-version:             0.3.0.0
-github:              "githubuser/ini"
+version:             0.3.1.0
+github:              "dapine/ini"
 license:             BSD3
 author:              "David Pinheiro"
 maintainer:          "davepinh@gmail.com"
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on Github at <https://github.com/githubuser/ini#readme>
+description:         Please see the README on Github at <https://github.com/dapine/ini#readme>
 
 dependencies:
 - base >= 4.7 && < 5
