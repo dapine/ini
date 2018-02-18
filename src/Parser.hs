@@ -2,6 +2,8 @@ module Parser
     ( parseKey
     , parseSectionName
     , parseInteger
+    , parseString
+    , parseBareString
     , parseDouble
     , parseBoolean
     ) where
@@ -30,6 +32,20 @@ parseSectionName = do
     sn <- many1 alphaNum
     char ']'
     return $ INISectionName sn
+
+-- INCOMPLETE: allow all characters
+parseString :: Parser INIParser
+parseString = do
+    char '"'
+    s <- many1 alphaNum
+    char '"'
+    return $ INIString s
+
+-- INCOMPLETE: allow all characters
+parseBareString :: Parser INIParser
+parseBareString = do
+    s <- many1 alphaNum
+    return $ INIString s
 
 parseInteger :: Parser INIParser
 parseInteger = do
