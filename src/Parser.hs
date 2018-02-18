@@ -6,6 +6,8 @@ module Parser
     , parseBareString
     , parseDouble
     , parseBoolean
+    , parseValue
+    , parseKeyValue
     ) where
 
 import Text.ParserCombinators.Parsec
@@ -16,7 +18,8 @@ data INIParser = INIKey String
                | INIDouble Double
                | INIBool Bool 
                | INISectionName String
-               | INISection (INIParser, [(String, INIParser)]) deriving (Eq, Show)
+               | INIKeyValue (INIParser, INIParser)
+               | INISection (INIParser, [INIParser]) deriving (Eq, Show)
 
 sign :: Parser String
 sign = string "-" <|> string "+" <|> string ""
@@ -71,3 +74,13 @@ parseBoolean = do
     return $ case x of
                "true" -> INIBool True
                "false" -> INIBool False
+
+parseValue :: Parser INIParser
+parseValue = try parseDouble <|> parseInteger <|> parseBoolean <|> parseString <|> parseBareString
+
+parseKeyValue :: Parser INIParser
+parseKeyValue = do
+    k <- parseKey
+    char '='
+    v <- parseValue
+    return $ INIKeyValue (k, v)
