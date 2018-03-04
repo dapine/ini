@@ -43,10 +43,9 @@ parseString = do
     char '"'
     return $ INIString s
 
--- INCOMPLETE: allow all characters
 parseBareString :: Parser INIParser
 parseBareString = do
-    s <- many1 alphaNum
+    s <- many1 anyChar
     return $ INIString s
 
 parseInteger :: Parser INIParser
@@ -84,11 +83,10 @@ parseKeyValue = do
     v <- lexeme parseValue
     return $ INIKeyValue (k, v)
 
--- INCOMPLETE: allow all characters
 parseComment :: Parser ()
 parseComment = do
     lexeme $ char ';'
-    skipMany1 alphaNum
+    skipMany1 anyChar
 
 lexeme :: Parser a -> Parser a
 lexeme parser = spaces *> parser <* spaces
