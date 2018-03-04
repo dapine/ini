@@ -31,9 +31,7 @@ parseKey = do
 
 parseSectionName :: Parser INIParser
 parseSectionName = do
-    char '['
-    sn <- many1 alphaNum
-    char ']'
+    sn <- between (lexeme $ char '[') (lexeme $ char ']') (many1 alphaNum)
     return $ INISectionName sn
 
 -- INCOMPLETE: allow all characters
@@ -80,7 +78,10 @@ parseValue = try parseDouble <|> parseInteger <|> parseBoolean <|> parseString <
 
 parseKeyValue :: Parser INIParser
 parseKeyValue = do
-    k <- parseKey
-    char '='
-    v <- parseValue
+    k <- lexeme parseKey
+    lexeme $ char '='
+    v <- lexeme parseValue
     return $ INIKeyValue (k, v)
+
+lexeme :: Parser a -> Parser a
+lexeme parser = spaces *> parser <* spaces
