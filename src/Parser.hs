@@ -8,6 +8,7 @@ module Parser
     , parseBoolean
     , parseValue
     , parseKeyValue
+    , parseComment
     ) where
 
 import Text.ParserCombinators.Parsec
@@ -82,6 +83,12 @@ parseKeyValue = do
     lexeme $ char '='
     v <- lexeme parseValue
     return $ INIKeyValue (k, v)
+
+-- INCOMPLETE: allow all characters
+parseComment :: Parser ()
+parseComment = do
+    lexeme $ char ';'
+    skipMany1 alphaNum
 
 lexeme :: Parser a -> Parser a
 lexeme parser = spaces *> parser <* spaces
