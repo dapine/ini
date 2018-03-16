@@ -48,7 +48,7 @@ parseString = do
 
 parseBareString :: Parser INIParser
 parseBareString = do
-    s <- many1 anyChar
+    s <- many1 (noneOf "\n")
     return $ INIString s
 
 parseInteger :: Parser INIParser
