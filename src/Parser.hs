@@ -10,6 +10,7 @@ module Parser
     , parseKeyValue
     , parseComment
     , parseSectionKeyValues
+    , parsePlainConfig
     ) where
 
 import Text.ParserCombinators.Parsec
@@ -21,7 +22,8 @@ data INIParser = INIKey String
                | INIBool Bool 
                | INISectionName String
                | INIKeyValue (INIParser, INIParser)
-               | INISection (INIParser, [INIParser]) deriving (Eq, Show)
+               | INISection (INIParser, [INIParser]) 
+               | INIConfig [INIParser] deriving (Eq, Show)
 
 sign :: Parser String
 sign = string "-" <|> string "+" <|> string ""
@@ -94,6 +96,11 @@ parseSectionKeyValues = do
     sec <- parseSectionName
     kvs <- many1 parseKeyValue
     return $ INISection (sec, kvs)
+
+parsePlainConfig :: Parser INIParser
+parsePlainConfig = do
+    kvs <- many1 parseKeyValue
+    return $ INIConfig kvs
 
 lexeme :: Parser a -> Parser a
 lexeme parser = spaces *> parser <* spaces
