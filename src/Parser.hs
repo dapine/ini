@@ -9,6 +9,7 @@ module Parser
     , parseValue
     , parseKeyValue
     , parseComment
+    , parseSectionKeyValues
     ) where
 
 import Text.ParserCombinators.Parsec
@@ -87,6 +88,12 @@ parseComment :: Parser ()
 parseComment = do
     lexeme $ char ';'
     skipMany1 anyChar
+
+parseSectionKeyValues :: Parser INIParser
+parseSectionKeyValues = do
+    sec <- parseSectionName
+    kvs <- many1 parseKeyValue
+    return $ INISection (sec, kvs)
 
 lexeme :: Parser a -> Parser a
 lexeme parser = spaces *> parser <* spaces
