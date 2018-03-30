@@ -1,6 +1,11 @@
 module Main where
 
-import Lib
+import Parser
+import Text.ParserCombinators.Parsec
+import System.Environment
 
 main :: IO ()
-main = someFunc
+main = do
+    (filename:_) <- getArgs
+    contents <- readFile filename
+    print $ parse parseINI "" contents

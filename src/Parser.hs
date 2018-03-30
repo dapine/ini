@@ -21,6 +21,7 @@ data INIParser = INIKey String
                | INIInteger Integer
                | INIDouble Double
                | INIBool Bool 
+               | INIComment String
                | INISectionName String
                | INIKeyValue (INIParser, INIParser)
                | INISection (INIParser, [INIParser]) 
@@ -88,25 +89,29 @@ parseKeyValue = do
     v <- lexeme parseValue
     return $ INIKeyValue (k, v)
 
-parseComment :: Parser ()
+parseComment :: Parser INIParser
 parseComment = do
     lexeme $ char ';'
-    skipMany1 anyChar
+    c <- many $ noneOf "\n"
+    return $ INIComment c
+
+parseLine :: Parser INIParser
+parseLine = try parseComment <|> parseKeyValue
 
 parseSectionKeyValues :: Parser INIParser
 parseSectionKeyValues = do
     sec <- parseSectionName
-    kvs <- many1 parseKeyValue
+    kvs <- many1 parseLine
     return $ INISection (sec, kvs)
 
 parsePlainConfig :: Parser INIParser
 parsePlainConfig = do
-    kvs <- many1 parseKeyValue
+    kvs <- many1 parseLine
     return $ INIConfig kvs
 
 parseINI :: Parser INIParser
 parseINI = do
-    p <- many parseSectionKeyValues <|> many parsePlainConfig
+    p <- many (try parseSectionKeyValues <|> parsePlainConfig)
     return $ INI p
 
 lexeme :: Parser a -> Parser a
